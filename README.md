@@ -1,28 +1,44 @@
-# esp32_time_bus
+# esp32-IDFM-departure-display
 
-An ESP32 firmware project that connects to Wi-Fi, calls the Île-de-France Mobilités stop-monitoring API, and parses the next departures from the JSON response.
+An ESP32 firmware for a novelty bus departure timer housed in a vintage manometer. Connects to the IDFM stop-monitoring API and drives a servo motor to indicate how many minutes until the next bus arrives.
 
-## What it does
+## Project vision
 
-- connects an ESP32 to a Wi-Fi network
+A repurposed analog gauge that displays real-time transport data instead of pressure readings—the servo needle points to minutes remaining on the dial face (0–60 min scale).
+
+## Current features
+
+- connects an ESP32 to Wi-Fi
 - queries the IDFM stop-monitoring endpoint over HTTPS
-- extracts departure timestamps from the response
-- logs the current time and upcoming departures
+- extracts next departure timestamps from JSON responses
+- calculates minutes until departure
+- logs timing data for servo calibration
+
+## Planned features
+
+- servo motor control to position gauge needle
+- deep sleep mode to reduce power consumption between API polls
 
 ## Configuration
 
 Copy [.env.example](.env.example) to [.env](.env) and fill in your local values:
 
-- `WIFI_SSID`
-- `WIFI_PASSWORD`
-- `IDFM_API_KEY`
+- `WIFI_SSID` – your Wi-Fi network name
+- `WIFI_PASSWORD` – your Wi-Fi password
+- `IDFM_API_KEY` – your IDFM API key (get one at [IDFM Marketplace](https://marketplace.iledefrance-mobilites.fr/))
+- `MONITORING_REF_ENCODED` – the URL-encoded stop point reference (e.g., `STIF%3AStopPoint%3AQ%3A12345%3A`)
 
 The build script reads [.env](.env) locally and injects those values at compile time.
 
-## Security note
+## Build & flash
 
-Do not commit Wi-Fi credentials or API keys. If any secret was already committed, rotate it and rewrite the git history before publishing.
+```bash
+cargo build --release
+cargo espflash flash --release
+```
 
-## Build
+OR
 
-Use the normal Cargo build flow for the ESP32 target configured by this project.
+```bash
+cargo run --release
+```
